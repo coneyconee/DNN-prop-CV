@@ -309,12 +309,12 @@ def updatehandprop(part,propnum):
 
 
 # import props and convert to imagetk format for tkinter to process
-head1 = ImageTk.PhotoImage((Image.open("assets/head1.png")).resize((160, 90)))
-head2 = ImageTk.PhotoImage((Image.open("assets/head2.png")).resize((160, 90)))
-head3 = ImageTk.PhotoImage((Image.open("assets/head3.png")).resize((160, 90)))
-hand1 = ImageTk.PhotoImage((Image.open("assets/hand1.png")).resize((160, 90)))
-hand2 = ImageTk.PhotoImage((Image.open("assets/hand2.png")).resize((160, 90)))
-hand3 = ImageTk.PhotoImage((Image.open("assets/hand3.png")).resize((160, 90)))
+head1 = ImageTk.PhotoImage((Image.open("assets/head1.png")).resize((110, 110)))
+head2 = ImageTk.PhotoImage((Image.open("assets/head2.png")).resize((110, 110)))
+head3 = ImageTk.PhotoImage((Image.open("assets/head3.png")).resize((110, 110)))
+hand1 = ImageTk.PhotoImage((Image.open("assets/hand1.png")).resize((110, 110)))
+hand2 = ImageTk.PhotoImage((Image.open("assets/hand2.png")).resize((110, 110)))
+hand3 = ImageTk.PhotoImage((Image.open("assets/hand3.png")).resize((110, 110)))
 
 # prop buttons
 headprop1 = Button(window,
@@ -379,6 +379,7 @@ handprop3 = Button(window,
                 command = lambda: updatehandprop('hand',3)
 )
 
+
 headprop1.place(x=0,y=105)
 headprop2.place(x=0,y=315)
 headprop3.place(x=0,y=525)
@@ -386,6 +387,27 @@ handprop1.place(x=1155,y=105)
 handprop2.place(x=1155,y=315)
 handprop3.place(x=1155,y=525)
 
+#labelling which buttons are for head props and which are for hand props
+headlabel = tk.Label(window, 
+                 text='HEAD PROPS', 
+                 anchor=tk.CENTER,       
+                 bg = '#DAE4FF',
+                 fg = 'black',
+                 height=3,              
+                 width=13,                  
+                 font=("Arial", 16, "bold"))
+
+handlabel = tk.Label(window, 
+                 text='HAND PROPS', 
+                 anchor=tk.CENTER,       
+                 bg = '#DAE4FF',
+                 fg = 'black',
+                 height=3,              
+                 width=13,                  
+                 font=("Arial", 16, "bold"))
+
+headlabel.place(x=0,y=0)
+handlabel.place(x=1155,y=0)
 window.mainloop()
 
 cap.release()
