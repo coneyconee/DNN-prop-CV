@@ -16,8 +16,8 @@ hands = mpHands.Hands(static_image_mode=False, max_num_hands=10, min_detection_c
 lastCaptureTime = 0
 captureCooldown = 2
 
-glasses = cv2.imread("jaron.png", cv2.IMREAD_UNCHANGED)
-ring = cv2.imread("jaron.png", cv2.IMREAD_UNCHANGED)
+glasses = cv2.resize(cv2.imread("assets/head1.png", cv2.IMREAD_UNCHANGED),(500,500))
+ring = cv2.resize(cv2.imread("assets/hand1.png", cv2.IMREAD_UNCHANGED),(200, 200))
 ring = imutils.rotate(ring, 0)
 
 cap = cv2.VideoCapture(0)
