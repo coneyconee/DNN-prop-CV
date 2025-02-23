@@ -3,6 +3,11 @@ import cv2
 import dlib
 import time
 import mediapipe as mp
+import tkinter as tk
+from tkmacosx import Button
+import cv2
+from PIL import Image, ImageTk
+import numpy as np
 
 model_path = "res10_300x300_ssd_iter_140000.caffemodel"
 config_path = "deploy.prototxt"
@@ -14,13 +19,15 @@ mp_hands = mp.solutions.hands
 hands = mp_hands.Hands(static_image_mode=False, max_num_hands=10, min_detection_confidence=0.2)
 
 glasses = cv2.imread("jaron.jpg", cv2.IMREAD_UNCHANGED)  
-ring = cv2.imread("800d.png", cv2.IMREAD_UNCHANGED)        
+# ring = cv2.imread("800d.png", cv2.IMREAD_UNCHANGED)      
+
+# defining props used
+headprop = 1
+handprop = 1
 
 cap = cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_FPS, 30)
 
-
-import numpy as np
 
 def overlay_transparent(background, overlay, x, y, overlay_size=None):
     if overlay is None or overlay.shape[0] == 0 or overlay.shape[1] == 0:
@@ -61,10 +68,11 @@ def overlay_transparent(background, overlay, x, y, overlay_size=None):
 
 
 
-while True:
+def dnnLoop(headprop, handprop):
     ret, frame = cap.read()
     if not ret:
-        break
+        cap.release()
+        exit()
 
     
     frame = cv2.flip(frame, 1)
@@ -133,14 +141,134 @@ while True:
             index_y = int(hand_landmarks.landmark[mp_hands.HandLandmark.THUMB_IP].y * h)
 
             ring_size = (250, 250)  
-            frame = overlay_transparent(frame, ring, index_x - 15, index_y - 15, ring_size)
+            # frame = overlay_transparent(frame, ring, index_x - 15, index_y - 15, ring_size)
 
-    cv2.imshow("Hand and Face + Landmarks + Props", frame)
+    return ret, frame
 
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+    # if cv2.waitKey(1) & 0xFF == ord('q'):
+    #     exit()
 
-    time.sleep(0.00005)
+
+# ------------------------UI-------------------------------
+
+window = tk.Tk()
+window.title("SST Photobooth")
+window.geometry("1280x720")
+window.minsize(1280, 720)
+window.maxsize(1280, 720)
+window.config(background = "#DAE4FF")
+
+# Create a label to display the video feed
+label = tk.Label(window,width=1020)
+label.place(x=130)
+
+def update_frame():
+    # ret, frame = cap.read()
+    global headprop, handprop
+    ret, frame = dnnLoop(headprop,handprop)
+    if ret:
+        # Convert frame from BGR to RGB becasue cv2 outputs in BGR and PIL takes RGB input
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        # Convert frame to PIL Image for PIL to process
+        img = Image.fromarray(frame)
+        # Convert Image to ImageTk format for tkinter to process
+        imgtk = ImageTk.PhotoImage(image=img)
+        # Update label with new image
+        label.imgtk = imgtk  # Keep reference to avoid garbage collection
+        label.configure(image=imgtk)
+    # Call this function again after 10ms
+    window.after(10, update_frame)
+
+# Start the video update loop
+update_frame()
+
+def updatehandprop(part,propnum):
+    global headprop, handprop
+    if part == 'head':
+        headprop = propnum
+    elif part == 'hand':
+        handprop = propnum
+    print(headprop,handprop)
+
+
+# import props and convert to imagetk format for tkinter to process
+head1 = ImageTk.PhotoImage((Image.open("assets/head1.png")).resize((160, 90)))
+head2 = ImageTk.PhotoImage((Image.open("assets/head2.png")).resize((160, 90)))
+head3 = ImageTk.PhotoImage((Image.open("assets/head3.png")).resize((160, 90)))
+hand1 = ImageTk.PhotoImage((Image.open("assets/hand1.png")).resize((160, 90)))
+hand2 = ImageTk.PhotoImage((Image.open("assets/hand2.png")).resize((160, 90)))
+hand3 = ImageTk.PhotoImage((Image.open("assets/hand3.png")).resize((160, 90)))
+
+# prop buttons
+headprop1 = Button(window,
+                width=130,
+                fg = "#DAE4FE", bg = "#DAE4FF",
+                borderless = 1,
+                activebackground = ("#AFB7CD"),
+                highlightbackground = "#DAE4FE",
+                focusthickness = 0,
+                image=head1,
+                command = lambda: updatehandprop('head',1)
+)
+headprop2 = Button(window,
+                width=130,
+                fg = "#DAE4FE", bg = "#DAE4FF",
+                borderless = 1,
+                activebackground = ("#AFB7CD"),
+                highlightbackground = "#DAE4FE",
+                focusthickness = 0,
+                image=head2,
+                command = lambda: updatehandprop('head',2)
+)
+headprop3 = Button(window,
+                width=130,
+                fg = "#DAE4FE", bg = "#DAE4FF",
+                borderless = 1,
+                activebackground = ("#AFB7CD"),
+                highlightbackground = "#DAE4FE",
+                focusthickness = 0,
+                image=head3,
+                command = lambda: updatehandprop('head',3)
+)
+
+handprop1 = Button(window,
+                width=130,
+                fg = "#DAE4FE", bg = "#DAE4FF",
+                borderless = 1,
+                activebackground = ("#AFB7CD"),
+                highlightbackground = "#DAE4FE",
+                focusthickness = 0,
+                image=hand1,
+                command = lambda: updatehandprop('hand',1)
+)
+handprop2 = Button(window,
+                width=130,
+                fg = "#DAE4FE", bg = "#DAE4FF",
+                borderless = 1,
+                activebackground = ("#AFB7CD"),
+                highlightbackground = "#DAE4FE",
+                focusthickness = 0,
+                image=hand2,
+                command = lambda: updatehandprop('hand',2)
+)
+handprop3 = Button(window,
+                width=130,
+                fg = "#DAE4FE", bg = "#DAE4FF",
+                borderless = 1,
+                activebackground = ("#AFB7CD"),
+                highlightbackground = "#DAE4FE",
+                focusthickness = 0,
+                image=hand3,
+                command = lambda: updatehandprop('hand',3)
+)
+
+headprop1.place(x=0,y=105)
+headprop2.place(x=0,y=315)
+headprop3.place(x=0,y=525)
+handprop1.place(x=1155,y=105)
+handprop2.place(x=1155,y=315)
+handprop3.place(x=1155,y=525)
+
+window.mainloop()
 
 cap.release()
-cv2.destroyAllWindows()
