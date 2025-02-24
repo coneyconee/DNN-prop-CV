@@ -1,2 +1,7 @@
 # DNN-prop-CV
-install cv2, dlib, mediapipe
+run:
+python3 -m venv venv
+source venv/bin/activate
+pip 3 install -r requirements.txt
+
+run: propsfinalGLASSES.py
