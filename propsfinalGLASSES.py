@@ -23,6 +23,7 @@ lastCaptureTime = 0
 captureCooldown = 2
 
 #glasses is headprop, ring is handprop
+# below 4 lines are written by Jaron
 headprops = [cv2.resize(cv2.imread("assets/sunverttwo{}.png".format(i), cv2.IMREAD_UNCHANGED),(300,300)) for i in range(1,4)] # loads head1, head2 and head3
 handprops = [cv2.resize(cv2.imread("assets/hand{}.png".format(i), cv2.IMREAD_UNCHANGED),(300,300)) for i in range(1,4)] # loads head1, head2 and head3
 glasses = headprops[0]
@@ -74,6 +75,7 @@ def palmClose(handLandmarks):
 # def dnn_loop(headprop, handprop):
 def dnn_loop(headprop,handprop):
     # sets the prop
+    # below 3 lines are written by Jaron
     global glasses, ring, headprops, handprops
     glasses = headprops[headprop-1]
     ring = handprops[handprop-1]
@@ -149,13 +151,14 @@ def dnn_loop(headprop,handprop):
                 xNew = cx + cosA * (xCoord - cx) - sinA * (yCoord - cy)
                 yNew = cy + sinA * (xCoord - cx) + cosA * (yCoord - cy)
                 return np.array([xNew, yNew])
-
+            
+            # below 4 lines are written by Jaron
             chinLeftRotated = rotatePoint(chinLeft, chinCenter, angle)
             chinRightRotated = rotatePoint(chinRight, chinCenter, angle)
+            scalefactor = (1.5**((eyeRight-eyeLeft)[0]/140))/1.5 # to scale the glasses variably that depends on the distance of person from screen, depending on distance between eyes on the screen
+            pts2 = np.array([eyeLeft-50*scalefactor, eyeRight-50*scalefactor, chinLeftRotated+25*2**scalefactor, chinRightRotated+25*2**scalefactor], dtype=np.float32)
 
-            pts2 = np.array([eyeLeft, eyeRight, chinLeftRotated, chinRightRotated], dtype=np.float32)
-
-            glassesResized = cv2.resize(glasses, (glasses.shape[1], glasses.shape[1]))
+            glassesResized = cv2.resize(glasses, (int(glasses.shape[1]*1.5*scalefactor), int(glasses.shape[1]*1.3*scalefactor)))
 
             #this offset is just in case you want to have a hat prop that is displaced away from the centre of the face (negative = up)
             hatoffset = 0
@@ -265,7 +268,7 @@ def dnn_loop(headprop,handprop):
     return ret, frame
 
 # ------------------------UI-------------------------------
-
+# everything below is written by Jaron
 window = tk.Tk()
 window.title("SST Photobooth")
 window.geometry("1280x720")
@@ -309,16 +312,16 @@ def updatehandprop(part,propnum):
 
 
 # import props and convert to imagetk format for tkinter to process
-head1 = ImageTk.PhotoImage((Image.open("assets/sunverttwo1.png")).resize((110, 110)))
-head2 = ImageTk.PhotoImage((Image.open("assets/sunverttwo2.png")).resize((110, 110)))
-head3 = ImageTk.PhotoImage((Image.open("assets/sunverttwo3.png")).resize((110, 110)))
+head1 = ImageTk.PhotoImage((Image.open("assets/sunverttwo1.png")).crop((0,0,1080,480)).resize((110, 50)))
+head2 = ImageTk.PhotoImage((Image.open("assets/sunverttwo2.png")).crop((0,0,1080,480)).resize((110, 50)))
+head3 = ImageTk.PhotoImage((Image.open("assets/sunverttwo3.png")).crop((0,0,1080,480)).resize((110, 50)))
 hand1 = ImageTk.PhotoImage((Image.open("assets/hand1.png")).resize((110, 110)))
 hand2 = ImageTk.PhotoImage((Image.open("assets/hand2.png")).resize((110, 110)))
 hand3 = ImageTk.PhotoImage((Image.open("assets/hand3.png")).resize((110, 110)))
 
 # prop buttons
 headprop1 = Button(window,
-                width=130,
+                width=130,height=130,
                 fg = "#DAE4FE", bg = "#DAE4FF",
                 borderless = 1,
                 activebackground = ("#AFB7CD"),
@@ -328,7 +331,7 @@ headprop1 = Button(window,
                 command = lambda: updatehandprop('head',1)
 )
 headprop2 = Button(window,
-                width=130,
+                width=130,height=130,
                 fg = "#DAE4FE", bg = "#DAE4FF",
                 borderless = 1,
                 activebackground = ("#AFB7CD"),
@@ -338,7 +341,7 @@ headprop2 = Button(window,
                 command = lambda: updatehandprop('head',2)
 )
 headprop3 = Button(window,
-                width=130,
+                width=130,height=130,
                 fg = "#DAE4FE", bg = "#DAE4FF",
                 borderless = 1,
                 activebackground = ("#AFB7CD"),
@@ -369,7 +372,7 @@ handprop2 = Button(window,
                 command = lambda: updatehandprop('hand',2)
 )
 handprop3 = Button(window,
-                width=130,
+                width=130, 
                 fg = "#DAE4FE", bg = "#DAE4FF",
                 borderless = 1,
                 activebackground = ("#AFB7CD"),
